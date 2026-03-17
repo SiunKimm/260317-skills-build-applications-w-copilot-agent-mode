@@ -2,6 +2,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import ResourceTablePage from './ResourceTablePage';
 import { extractCollection, logFetchedCollection } from '../utils/api';
 
+function resolveWorkoutsEndpoint(apiBaseUrl) {
+  if (apiBaseUrl) {
+    return `${apiBaseUrl}/workouts/`;
+  }
+
+  if (process.env.REACT_APP_CODESPACE_NAME) {
+    return `https://${process.env.REACT_APP_CODESPACE_NAME}-8000.app.github.dev/api/workouts/`;
+  }
+
+  return 'http://localhost:8000/api/workouts/';
+}
+
 function Workouts({ apiBaseUrl }) {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +25,7 @@ function Workouts({ apiBaseUrl }) {
       setError('');
 
       try {
-        const endpoint = `${apiBaseUrl}/workouts/`;
+        const endpoint = resolveWorkoutsEndpoint(apiBaseUrl);
         const response = await fetch(endpoint, {
           signal,
         });
@@ -80,7 +92,7 @@ function Workouts({ apiBaseUrl }) {
       eyebrow="Workouts"
       title="운동 추천"
       description="난이도와 코치 기준으로 추천 운동 프로그램을 탐색할 수 있습니다."
-      endpoint={`${apiBaseUrl}/workouts/`}
+      endpoint={resolveWorkoutsEndpoint(apiBaseUrl)}
       rows={workouts}
       columns={columns}
       stats={stats}

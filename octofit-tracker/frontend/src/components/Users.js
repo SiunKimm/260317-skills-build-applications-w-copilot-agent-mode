@@ -2,6 +2,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import ResourceTablePage from './ResourceTablePage';
 import { extractCollection, logFetchedCollection } from '../utils/api';
 
+function resolveUsersEndpoint(apiBaseUrl) {
+  if (apiBaseUrl) {
+    return `${apiBaseUrl}/users/`;
+  }
+
+  if (process.env.REACT_APP_CODESPACE_NAME) {
+    return `https://${process.env.REACT_APP_CODESPACE_NAME}-8000.app.github.dev/api/users/`;
+  }
+
+  return 'http://localhost:8000/api/users/';
+}
+
 function Users({ apiBaseUrl }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +25,7 @@ function Users({ apiBaseUrl }) {
       setError('');
 
       try {
-        const endpoint = `${apiBaseUrl}/users/`;
+        const endpoint = resolveUsersEndpoint(apiBaseUrl);
         const response = await fetch(endpoint, {
           signal,
         });
@@ -82,7 +94,7 @@ function Users({ apiBaseUrl }) {
       eyebrow="Users"
       title="사용자 현황"
       description="운동 목표와 누적 포인트를 기준으로 팀원 활동을 추적합니다."
-      endpoint={`${apiBaseUrl}/users/`}
+      endpoint={resolveUsersEndpoint(apiBaseUrl)}
       rows={users}
       columns={columns}
       stats={stats}

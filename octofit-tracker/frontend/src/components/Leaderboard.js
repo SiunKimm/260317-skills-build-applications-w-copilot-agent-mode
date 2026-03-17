@@ -2,6 +2,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import ResourceTablePage from './ResourceTablePage';
 import { extractCollection, logFetchedCollection } from '../utils/api';
 
+function resolveLeaderboardEndpoint(apiBaseUrl) {
+  if (apiBaseUrl) {
+    return `${apiBaseUrl}/leaderboard/`;
+  }
+
+  if (process.env.REACT_APP_CODESPACE_NAME) {
+    return `https://${process.env.REACT_APP_CODESPACE_NAME}-8000.app.github.dev/api/leaderboard/`;
+  }
+
+  return 'http://localhost:8000/api/leaderboard/';
+}
+
 function formatDate(value) {
   if (!value) {
     return '날짜 정보 없음';
@@ -23,7 +35,7 @@ function Leaderboard({ apiBaseUrl }) {
       setError('');
 
       try {
-        const endpoint = `${apiBaseUrl}/leaderboard/`;
+        const endpoint = resolveLeaderboardEndpoint(apiBaseUrl);
         const response = await fetch(endpoint, {
           signal,
         });
@@ -96,7 +108,7 @@ function Leaderboard({ apiBaseUrl }) {
       eyebrow="Leaderboard"
       title="경쟁형 리더보드"
       description="카테고리별 순위와 점수를 일관된 테이블 레이아웃으로 확인할 수 있습니다."
-      endpoint={`${apiBaseUrl}/leaderboard/`}
+      endpoint={resolveLeaderboardEndpoint(apiBaseUrl)}
       rows={entries}
       columns={columns}
       stats={stats}

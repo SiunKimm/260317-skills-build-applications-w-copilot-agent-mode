@@ -2,6 +2,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import ResourceTablePage from './ResourceTablePage';
 import { extractCollection, logFetchedCollection } from '../utils/api';
 
+function resolveActivitiesEndpoint(apiBaseUrl) {
+  if (apiBaseUrl) {
+    return `${apiBaseUrl}/activities/`;
+  }
+
+  if (process.env.REACT_APP_CODESPACE_NAME) {
+    return `https://${process.env.REACT_APP_CODESPACE_NAME}-8000.app.github.dev/api/activities/`;
+  }
+
+  return 'http://localhost:8000/api/activities/';
+}
+
 function formatDateTime(value) {
   if (!value) {
     return '시간 정보 없음';
@@ -24,7 +36,7 @@ function Activities({ apiBaseUrl }) {
       setError('');
 
       try {
-        const endpoint = `${apiBaseUrl}/activities/`;
+        const endpoint = resolveActivitiesEndpoint(apiBaseUrl);
         const response = await fetch(endpoint, {
           signal,
         });
@@ -90,7 +102,7 @@ function Activities({ apiBaseUrl }) {
       eyebrow="Activities"
       title="활동 기록"
       description="최근 수행한 운동 로그와 에너지 소모를 실시간으로 확인합니다."
-      endpoint={`${apiBaseUrl}/activities/`}
+      endpoint={resolveActivitiesEndpoint(apiBaseUrl)}
       rows={activities}
       columns={columns}
       stats={stats}

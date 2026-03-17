@@ -2,6 +2,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import ResourceTablePage from './ResourceTablePage';
 import { extractCollection, logFetchedCollection } from '../utils/api';
 
+function resolveTeamsEndpoint(apiBaseUrl) {
+  if (apiBaseUrl) {
+    return `${apiBaseUrl}/teams/`;
+  }
+
+  if (process.env.REACT_APP_CODESPACE_NAME) {
+    return `https://${process.env.REACT_APP_CODESPACE_NAME}-8000.app.github.dev/api/teams/`;
+  }
+
+  return 'http://localhost:8000/api/teams/';
+}
+
 function Teams({ apiBaseUrl }) {
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +25,7 @@ function Teams({ apiBaseUrl }) {
       setError('');
 
       try {
-        const endpoint = `${apiBaseUrl}/teams/`;
+        const endpoint = resolveTeamsEndpoint(apiBaseUrl);
         const response = await fetch(endpoint, {
           signal,
         });
@@ -80,7 +92,7 @@ function Teams({ apiBaseUrl }) {
       eyebrow="Teams"
       title="팀 관리 보드"
       description="팀 주장, 모토, 인원 수와 포인트 집계를 한눈에 확인할 수 있습니다."
-      endpoint={`${apiBaseUrl}/teams/`}
+      endpoint={resolveTeamsEndpoint(apiBaseUrl)}
       rows={teams}
       columns={columns}
       stats={stats}
