@@ -1,3 +1,5 @@
+"""Populate the octofit_db database with test data."""
+
 from datetime import date, timedelta
 
 from django.core.management.base import BaseCommand
