@@ -1,5 +1,7 @@
 from datetime import date
+from io import StringIO
 
+from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
@@ -107,3 +109,27 @@ class OctoFitCollectionTests(TestCase):
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
                 self.assertGreaterEqual(len(response.json()), 1)
+
+    def test_populate_db_creates_expected_test_data(self):
+        Activity.objects.all().delete()
+        LeaderboardEntry.objects.all().delete()
+        Workout.objects.all().delete()
+        FitnessUser.objects.all().delete()
+        Team.objects.all().delete()
+
+        stdout = StringIO()
+        call_command('populate_db', stdout=stdout)
+
+        self.assertEqual(FitnessUser.objects.count(), 6)
+        self.assertEqual(Team.objects.count(), 2)
+        self.assertEqual(Activity.objects.count(), 6)
+        self.assertEqual(LeaderboardEntry.objects.count(), 5)
+        self.assertEqual(Workout.objects.count(), 4)
+
+        team_names = {team.name for team in Team.objects.all()}
+        hero_aliases = {user.hero_alias for user in FitnessUser.objects.all()}
+
+        self.assertIn('marvel team', team_names)
+        self.assertIn('dc team', team_names)
+        self.assertIn('Spider-Man', hero_aliases)
+        self.assertIn('users=6', stdout.getvalue())
