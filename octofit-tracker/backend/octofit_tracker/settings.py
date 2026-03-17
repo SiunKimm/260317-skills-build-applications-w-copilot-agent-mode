@@ -16,12 +16,24 @@ SECRET_KEY = 'django-insecure-&**zm(j@(nyeho_0ew-wxqs^p7$pd2htrmr1e7^#obv@cj1sb-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+CODESPACE_NAME = os.environ.get('CODESPACE_NAME')
+CODESPACE_HOST = (
+    f'{CODESPACE_NAME}-8000.app.github.dev' if CODESPACE_NAME else None
+)
+
 MONGODB_NAME = 'octofit_db'
 MONGODB_URI = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017')
 
-ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1']
-if os.environ.get('CODESPACE_NAME'):
-    ALLOWED_HOSTS.append(f"{os.environ.get('CODESPACE_NAME')}-8000.app.github.dev")
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+if CODESPACE_HOST:
+    ALLOWED_HOSTS.append(CODESPACE_HOST)
+
+CSRF_TRUSTED_ORIGINS = []
+if CODESPACE_HOST:
+    CSRF_TRUSTED_ORIGINS.append(f'https://{CODESPACE_HOST}')
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 
 
 # Application definition
